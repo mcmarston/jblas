@@ -585,6 +585,22 @@ JNIEXPORT jint JNICALL Java_org_jblas_NativeBlas_spotrf
 
 /*
  * Class:     org_jblas_NativeBlas
+ * Method:    dtrtri
+ * Signature: (CCI[DII)I
+ */
+JNIEXPORT jint JNICALL Java_org_jblas_NativeBlas_dtrtri
+  (JNIEnv *, jclass, jchar, jchar, jint, jdoubleArray, jint, jint);
+
+/*
+ * Class:     org_jblas_NativeBlas
+ * Method:    strtri
+ * Signature: (CCI[FII)I
+ */
+JNIEXPORT jint JNICALL Java_org_jblas_NativeBlas_strtri
+  (JNIEnv *, jclass, jchar, jchar, jint, jfloatArray, jint, jint);
+
+/*
+ * Class:     org_jblas_NativeBlas
  * Method:    cgesvd
  * Signature: (CCII[FII[FI[FII[FII[FII[FI)I
  */
@@ -630,6 +646,22 @@ JNIEXPORT jint JNICALL Java_org_jblas_NativeBlas_dsygvd
  */
 JNIEXPORT jint JNICALL Java_org_jblas_NativeBlas_ssygvd
   (JNIEnv *, jclass, jint, jchar, jchar, jint, jfloatArray, jint, jint, jfloatArray, jint, jint, jfloatArray, jint, jfloatArray, jint, jint, jintArray, jint, jint);
+
+/*
+ * Class:     org_jblas_NativeBlas
+ * Method:    dgels
+ * Signature: (CIII[DII[DII[DII)I
+ */
+JNIEXPORT jint JNICALL Java_org_jblas_NativeBlas_dgels
+  (JNIEnv *, jclass, jchar, jint, jint, jint, jdoubleArray, jint, jint, jdoubleArray, jint, jint, jdoubleArray, jint, jint);
+
+/*
+ * Class:     org_jblas_NativeBlas
+ * Method:    sgels
+ * Signature: (CIII[FII[FII[FII)I
+ */
+JNIEXPORT jint JNICALL Java_org_jblas_NativeBlas_sgels
+  (JNIEnv *, jclass, jchar, jint, jint, jint, jfloatArray, jint, jint, jfloatArray, jint, jint, jfloatArray, jint, jint);
 
 /*
  * Class:     org_jblas_NativeBlas

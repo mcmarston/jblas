@@ -192,7 +192,7 @@ public class SimpleBlas {
 					y.data[i] = 0.0;
 			}
 
-	
+
 			for (int j = 0; j < a.columns; j++) {
 				double xj = x.get(j);
 				if (xj != 0.0) {
@@ -394,7 +394,7 @@ public class SimpleBlas {
 				throw new LapackException("DSYGVD", "The leading minor of order " + (info - A.rows) + " of B is not positive definite.");
 		}
 	}
-	
+
 	public static int sygvx(int itype, char jobz, char range, char uplo, DoubleMatrix A,
 			DoubleMatrix B, double vl, double vu, int il, int iu, double abstol,
 			int[] m, DoubleMatrix W, DoubleMatrix Z) {
@@ -460,6 +460,39 @@ public class SimpleBlas {
 		} else if (info > 0) {
 			throw new LapackConvergenceException("DGESD", info + " off-diagonal elements of an intermediat bidiagonal form did not converge to 0.");
 		}
+	}
+
+	/**
+	 * Generalized Least Squares via *GELS.
+	 *
+	 * Note that B must be padded to contain the solution matrix. This occurs when A has fewer rows
+	 * than columns.
+	 *
+	 * For example: in A * X = B, A is (m,n), X is (n,k) and B is (m,k). Now if m < n, since B is overwritten to contain
+	 * the solution (in classical LAPACK style), B needs to be padded to be an (n,k) matrix.
+	 *
+	 * Likewise, if m > n, the solution consists only of the first n rows of B.
+	 *
+	 * @param A an (m,n) matrix
+	 * @param B an (max(m,n), k) matrix (well, at least)
+	 */
+	public static void gels(DoubleMatrix A, DoubleMatrix B) {
+		int m = A.rows;
+		int n = A.columns;
+		int nrhs = B.columns;
+		int maxmn = max(m, n);
+
+		if (B.rows < maxmn) {
+			throw new SizeException("Result matrix B must be padded to contain the solution matrix X!");
+		}
+
+		int info = NativeBlas.dgels('N', m, n, nrhs, A.data, 0, m, B.data, 0, B.rows);
+		if (info == 0) {
+			return;
+		} else if (info < 0) {
+			throw new LapackArgumentException("DGELS", -info);
+		} else if (info > 0) {
+			throw new LapackConvergenceException("DGELS", "The " + info + "-th diagonal element of the triangular factor of A is zero, so that A does not have full rank; the least squares solution could not be computed."); }
 	}
 
 	public static void geqrf(DoubleMatrix A, DoubleMatrix tau) {
@@ -620,7 +653,7 @@ public class SimpleBlas {
 					y.data[i] = 0.0f;
 			}
 
-	
+
 			for (int j = 0; j < a.columns; j++) {
 				float xj = x.get(j);
 				if (xj != 0.0f) {
@@ -815,7 +848,7 @@ public class SimpleBlas {
 				throw new LapackException("DSYGVD", "The leading minor of order " + (info - A.rows) + " of B is not positive definite.");
 		}
 	}
-	
+
 	public static int sygvx(int itype, char jobz, char range, char uplo, FloatMatrix A,
 			FloatMatrix B, float vl, float vu, int il, int iu, float abstol,
 			int[] m, FloatMatrix W, FloatMatrix Z) {

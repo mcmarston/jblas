@@ -121,7 +121,7 @@ generated-sources: \
   scripts/fortranwrapper.rb scripts/fortran/types.rb \
   scripts/fortran/java.rb scripts/java-class.java scripts/java-impl.c \
   $(SRC_JAVA)/org/jblas/util/ArchFlavor.java #src/org/jblas/NativeBlas.java
-	$(RUBY) scripts/fortranwrapper.rb --complexcc $(CCC) $(PACKAGE) NativeBlas \
+	$(RUBY) scripts/fortranwrapper.rb -f --complexcc $(CCC) $(PACKAGE) NativeBlas \
 	$(BLAS)/[sdcz]copy.f \
 	$(BLAS)/[sdcz]swap.f \
 	$(BLAS)/[sdcz]axpy.f \
@@ -142,8 +142,10 @@ generated-sources: \
 	$(LAPACK)/[sdcz]geev.f \
 	$(LAPACK)/[sd]getrf.f \
 	$(LAPACK)/[sd]potrf.f \
+	$(LAPACK)/[sd]trtri.f \
 	$(LAPACK)/[sdcz]gesvd.f \
 	$(LAPACK)/[sd]sygvd.f \
+	$(LAPACK)/[sd]gels.f \
 	$(LAPACK)/[sd]gelsd.f \
 	$(LAPACK)/ilaenv.f \
 	$(LAPACK)/[sd]geqrf.f $(LAPACK)/[sd]ormqr.f \

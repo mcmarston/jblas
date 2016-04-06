@@ -1,6 +1,15 @@
 # maven target repo
 
 target/
+config/PrintProperty.class
+config/arch_flavor
+configure.log
+configure.options
+configure.out
+configure.xml
+generated-sources
+lapack-lite*/*
+
 
 # idea files
 .idea/

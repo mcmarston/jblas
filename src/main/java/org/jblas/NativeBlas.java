@@ -333,6 +333,8 @@ public class NativeBlas {
   public static native int sgetrf(int m, int n, float[] a, int aIdx, int lda, int[] ipiv, int ipivIdx);
   public static native int dpotrf(char uplo, int n, double[] a, int aIdx, int lda);
   public static native int spotrf(char uplo, int n, float[] a, int aIdx, int lda);
+  public static native int dtrtri(char uplo, char diag, int n, double[] a, int aIdx, int lda);
+  public static native int strtri(char uplo, char diag, int n, float[] a, int aIdx, int lda);
   public static native int cgesvd(char jobu, char jobvt, int m, int n, float[] a, int aIdx, int lda, float[] s, int sIdx, float[] u, int uIdx, int ldu, float[] vt, int vtIdx, int ldvt, float[] work, int workIdx, int lwork, float[] rwork, int rworkIdx);
   public static int cgesvd(char jobu, char jobvt, int m, int n, float[] a, int aIdx, int lda, float[] s, int sIdx, float[] u, int uIdx, int ldu, float[] vt, int vtIdx, int ldvt, float[] rwork, int rworkIdx) {
     int info;
@@ -414,6 +416,32 @@ public class NativeBlas {
     lwork = (int) work[0]; work = new float[lwork];
     liwork = (int) iwork[0]; iwork = new int[liwork];
     info = ssygvd(itype, jobz, uplo, n, a, aIdx, lda, b, bIdx, ldb, w, wIdx, work, 0, lwork, iwork, 0, liwork);
+    return info;
+  }
+
+  public static native int dgels(char trans, int m, int n, int nrhs, double[] a, int aIdx, int lda, double[] b, int bIdx, int ldb, double[] work, int workIdx, int lwork);
+  public static int dgels(char trans, int m, int n, int nrhs, double[] a, int aIdx, int lda, double[] b, int bIdx, int ldb) {
+    int info;
+    double[] work = new double[1];
+    int lwork;
+    info = dgels(trans, m, n, nrhs, doubleDummy, 0, lda, doubleDummy, 0, ldb, work, 0, -1);
+    if (info != 0)
+      return info;
+    lwork = (int) work[0]; work = new double[lwork];
+    info = dgels(trans, m, n, nrhs, a, aIdx, lda, b, bIdx, ldb, work, 0, lwork);
+    return info;
+  }
+
+  public static native int sgels(char trans, int m, int n, int nrhs, float[] a, int aIdx, int lda, float[] b, int bIdx, int ldb, float[] work, int workIdx, int lwork);
+  public static int sgels(char trans, int m, int n, int nrhs, float[] a, int aIdx, int lda, float[] b, int bIdx, int ldb) {
+    int info;
+    float[] work = new float[1];
+    int lwork;
+    info = sgels(trans, m, n, nrhs, floatDummy, 0, lda, floatDummy, 0, ldb, work, 0, -1);
+    if (info != 0)
+      return info;
+    lwork = (int) work[0]; work = new float[lwork];
+    info = sgels(trans, m, n, nrhs, a, aIdx, lda, b, bIdx, ldb, work, 0, lwork);
     return info;
   }
 
