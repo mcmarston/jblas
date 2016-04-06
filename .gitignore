@@ -11,8 +11,4 @@ generated-sources
 lapack-lite*/*
 
 
-# idea files
-.idea/
-*.ipr
-*.iml
-*.iws
+
