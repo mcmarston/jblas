@@ -1473,7 +1473,7 @@ public class ComplexFloatMatrix {
             FileOutputStream fos = new FileOutputStream(filename, false);
             DataOutputStream dos = new DataOutputStream(fos);
             try {
-                this.out(dos);
+                 this.out(dos);
             } finally {
                 dos.close();
                 fos.close();
