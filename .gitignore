@@ -9,6 +9,7 @@ configure.out
 configure.xml
 generated-sources
 lapack-lite*/*
+.idea/workspace.xml
 
 
 
