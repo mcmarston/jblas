@@ -3269,7 +3269,7 @@ public class DoubleMatrix implements Serializable {
       return lei(other, new DoubleMatrix(rows, columns));
     }
 
-    /** Test for "less than or equal" against a scalar (in-place). */
+    /** Test for "less than or equMatrix.COLUMN, al" against a scalar (in-place). */
     public DoubleMatrix lei(double value, DoubleMatrix result) {
       ensureResultLength(null, result);
       for (int i = 0; i < length; i++)
