@@ -3,14 +3,7 @@ Install intel parallel studio and ms visual studio
 run the pxevars.bat intel64 
 to set the environment variables
 
-icl /Qstd=c99 -I"%MKLROOT%"\inlcude -I"%JAVA_HOME%"\include -I"%JAVA_HOME%"\include\win32 src\main\c\NativeBlas.c /LD /link mkl_intel_lp64.lib mkl_core.lib mkl_sequential.lib
-
-cl /Qstd=c99 -I"%JAVA_HOME%"\include -I"%JAVA_HOME%"\include\win32 src\main\c\NativeBlas.c /LD /link mkl_intel_lp64.lib mkl_core.lib mkl_sequential.lib
-
-
-icl /Qstd=c99 -I"%MKLROOT%"\inlcude -I"%JAVA_HOME%"\include -I"%JAVA_HOME%"\include\win32 src\main\c\jblas_arch_flavor.c /LD
-
-
-
-
+for intel compilers
+icl /0x /Qstd=c99 -I"%MKLROOT%"\inlcude -I"%JAVA_HOME%"\include -I"%JAVA_HOME%"\include\win32 src\main\c\NativeBlas.c /LD /link mkl_intel_lp64.lib mkl_core.lib mkl_sequential.lib
+icl /0x /Qstd=c99 -I"%MKLROOT%"\inlcude -I"%JAVA_HOME%"\include -I"%JAVA_HOME%"\include\win32 src\main\c\jblas_arch_flavor.c /LD
 
