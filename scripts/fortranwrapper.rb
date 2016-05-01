@@ -79,7 +79,7 @@ puts "complex calling convention = #{$complexcc}"
 package = ARGV[0]
 klass = ARGV[1]
 
-$debug = false
+$debug = true
 
 number_of_routines = 0
 routines = []

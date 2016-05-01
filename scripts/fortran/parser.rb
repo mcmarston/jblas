@@ -75,7 +75,7 @@ module Fortran
 
   # Matches e.g. DOUBLE PRECISION FUNCTION DDOT(N,DX,INCX,DY,INCY)
   FunctionDecl =
-    Regexp.compile /\A\s+([A-Z ]+) FUNCTION ([A-Z0-9]+)\(\ *([A-Z0-9, ]+)\ *\)/
+    Regexp.compile /\A\s+([A-Z0-9\* ]+) FUNCTION ([A-Z0-9]+)\(\ *([A-Z0-9, ]+)\ *\)/
 
   # Matches e.g. INTEGER INCX,INCY,N
   VariableDecl =
@@ -83,7 +83,7 @@ module Fortran
 
   # Matches e.g. *  LDA     (input) INTEGER
   MetaComment =
-    Regexp.compile /\A\*\s*([A-Z0-9,]+)\s+\(([a-zA-Z\/]*)\)/
+    Regexp.compile /\A\*>\s+\\param\[([a-zA-Z,\/]*)\]\s+([a-zA-Z]*)/
 
   # Matches e.g. A, but also DX(*)
   ArgumentParens =
@@ -155,7 +155,7 @@ module Fortran
         name = $2
         args = $3.scan /[A-Z0-9]+/
         routine = Fortran.function return_type, name, args
-        puts "   FunctionDecl matched" if $debug
+        puts "   FunctionDecl matched --- " + name if $debug
         #
         # parse argument types, e.g.
         #
@@ -185,7 +185,7 @@ module Fortran
         # *  JOBVL   (input) CHARACTER*1
         #
       when MetaComment
-        args = $1; comment = $2
+        comment = $1; args = $2
         puts "#{args} -> comment \"#{comment}\"" if $debug
         args.split(',').each do |argname|
           at = routine.argtype[argname]

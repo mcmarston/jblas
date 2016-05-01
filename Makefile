@@ -150,8 +150,11 @@ generated-sources: \
 	$(LAPACK)/ilaenv.f \
 	$(LAPACK)/[sd]geqrf.f $(LAPACK)/[sd]ormqr.f \
 	$(LAPACK)/[sd]orgqr.f \
+	$(LAPACK)/[sd]geqrt.f \
+	$(LAPACK)/[sd]gemqrt.f \
+	$(LAPACK)/[sd]trtrs.f \
 	$(LAPACK)/[sd]sygvx.f
-	ant javah
+	ant -verbose javah
 	touch $@
 
 $(SRC_C)/NativeBlas.c: generated-sources

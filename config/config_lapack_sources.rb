@@ -48,17 +48,17 @@ end
 
 desc 'search for lapack sources (configure by --lapack=dir)'
 configure 'LAPACK_HOME' do
-  lapack_home = $opts.get :lapack, './lapack-lite-3.1.1'
+  lapack_home = $opts.get :lapack, './lapack-3.6.0'
   begin
     check_lapack_home(lapack_home)
   rescue ConfigError => e
     if $opts.defined? :download_lapack
       puts "trying to download lapack (about 5M)"
       print "Looking for wget..."; check_cmd 'wget'; JblasConfig.ok
-      lapack_tgz = File.join('.', 'lapack-lite-3.1.1.tgz')
+      lapack_tgz = File.join('.', 'lapack-3.6.0.tgz')
       File.delete(lapack_tgz) if File.exist?(lapack_tgz)
-      system("wget http://www.netlib.org/lapack/lapack-lite-3.1.1.tgz")
-      system("tar xzvf lapack-lite-3.1.1.tgz")
+      system("wget http://www.netlib.org/lapack/lapack-3.6.0.tgz")
+      system("tar xzvf lapack-3.6.0.tgz")
       check_lapack_home(lapack_home)
     else
       CONFIG['LAPACK_HOME'] = ''
