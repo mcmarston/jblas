@@ -62,7 +62,7 @@ module LibHelpers
   end
 
   # returns an array of the symbols defined in the library +fn+.
-  def libsyms(fn)
+  def cd libsyms(fn)
     nmopt = File.extname(fn) == '.so' ? '-D' : ''
     %x(#{JblasConfig::CONFIG['NM']} -p #{nmopt} #{fn.escape}).split("\n").grep(/ T _?([a-zA-Z0-9_]+)/) {|m| $1}
   end

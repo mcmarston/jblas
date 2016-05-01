@@ -10,6 +10,8 @@ configure.xml
 generated-sources
 lapack-lite*/*
 .idea/workspace.xml
+*.*~
+*.tgz
 
 
 

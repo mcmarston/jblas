@@ -3269,7 +3269,7 @@ public class FloatMatrix implements Serializable {
       return lei(other, new FloatMatrix(rows, columns));
     }
 
-    /** Test for "less than or equal" against a scalar (in-place). */
+    /** Test for "less than or equMatrix.COLUMN, al" against a scalar (in-place). */
     public FloatMatrix lei(float value, FloatMatrix result) {
       ensureResultLength(null, result);
       for (int i = 0; i < length; i++)
