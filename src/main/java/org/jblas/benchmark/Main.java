@@ -36,12 +36,13 @@
 package org.jblas.benchmark;
 
 import java.io.PrintStream;
+
 import org.jblas.util.Logger;
 
 /**
  * A simple command-line style benchmarking program.
- * 
- * <p>Benchmarks matrix-matrix multiplication, and compares to a 
+ * <p>
+ * <p>Benchmarks matrix-matrix multiplication, and compares to a
  * pure Java implementation</p>
  *
  * @author Mikio L. Braun
@@ -49,10 +50,14 @@ import org.jblas.util.Logger;
 public class Main {
 
     static Benchmark[] multiplicationBenchmarks = {
-        new JavaDoubleMultiplicationBenchmark(),
-        new JavaFloatMultiplicationBenchmark(),
-        new NativeDoubleMultiplicationBenchmark(),
-        new NativeFloatMultiplicationBenchmark(),};
+            new JavaDoubleMultiplicationBenchmark(),
+            new JavaFloatMultiplicationBenchmark(),
+            new NativeDoubleMultiplicationBenchmark(),
+            new NativeFloatMultiplicationBenchmark(),
+            new NativeDoubleQRBenchmark(),
+            new NativeDoubleQRRecursiveBenchmark(),
+            new NativeDoubleSVDBenchmark()
+    };
 
     public static void printHelp() {
         System.out.printf("Usage: benchmark [opts]%n"
@@ -61,6 +66,7 @@ public class Main {
                 + "%n"
                 + "  --arch-flavor=value     overriding arch flavor (e.g. --arch-flavor=sse2)%n"
                 + "  --skip-java             don't run java benchmarks%n"
+                + "  --ls                    run the qr and svd tests only%n"
                 + "  --help                  show this help%n"
                 + "  --debug                 set config levels to debug%n"
                 + "%njblas version " + org.jblas.Info.VERSION + "%n");
@@ -71,6 +77,7 @@ public class Main {
         PrintStream out = System.out;
 
         boolean skipJava = false;
+        boolean skipMults = false;
         boolean unrecognizedOptions = false;
 
         Logger log = Logger.getLogger();
@@ -91,6 +98,8 @@ public class Main {
                     org.jblas.util.ArchFlavor.overrideArchFlavor(value);
                 } else if (arg.equals("--skip-java")) {
                     skipJava = true;
+                } else if (arg.equals("--ls")) {
+                    skipMults = true;
                 } else if (arg.equals("--help")) {
                     printHelp();
                     return;
@@ -114,7 +123,7 @@ public class Main {
         org.jblas.util.SanityChecks.main(args);
         out.println();
 
-        out.println("Each benchmark will take about 5 seconds...");
+        out.println("Each benchmark will take about 10 seconds...");
 
         for (Benchmark b : multiplicationBenchmarks) {
             if (skipJava) {
@@ -123,13 +132,18 @@ public class Main {
                 }
             }
 
+            if (skipMults) {
+                if (b.getName().contains("multiplication"))
+                    continue;
+            }
+
             out.println();
             out.println("Running benchmark \"" + b.getName() + "\".");
             for (int n : multiplicationSizes) {
                 out.printf("n = %-5d: ", n);
                 out.flush();
 
-                BenchmarkResult result = b.run(n, 5.0);
+                BenchmarkResult result = b.run(n, 10.0);
 
                 result.printResult();
             }

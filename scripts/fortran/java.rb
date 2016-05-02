@@ -95,7 +95,7 @@ module Fortran
         self.basetype = 'CHARACTER*N'
       end
       
-      result = if array or comment =~ /output/
+      result = if array or comment =~ /out/
         ArrayTypeMap[basetype]
       else
         StdTypeMap[basetype]

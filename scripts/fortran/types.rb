@@ -92,7 +92,7 @@ module Fortran
     end
 
     def output?
-      comment.nil? or comment =~ /output/
+      comment.nil? or comment =~ /out/
     end
   end
 
@@ -151,7 +151,7 @@ module Fortran
     def number_of_scalar_output_arguments
       count = 0
       each_arg do |name, type|
-        if type.comment =~ /output/ and not type.array
+        if type.comment =~ /out/ and not type.array
           count += 1
         end
       end

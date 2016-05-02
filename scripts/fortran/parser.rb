@@ -71,30 +71,30 @@ module Fortran
 
   # Matches e.g. SUBROUTINE DAXPY(N,DA,DX,INCX,DY, INCY)
   SubroutineDecl =
-    Regexp.compile /\A\s+SUBROUTINE ([A-Z0-9]+)\(\ *([A-Z0-9, ]+)\ *\)/
+      Regexp.compile /\A\s+SUBROUTINE ([A-Z0-9]+)\(\ *([A-Z0-9, ]+)\ *\)/
 
   # Matches e.g. DOUBLE PRECISION FUNCTION DDOT(N,DX,INCX,DY,INCY)
   FunctionDecl =
-    Regexp.compile /\A\s+([A-Z0-9\* ]+) FUNCTION ([A-Z0-9]+)\(\ *([A-Z0-9, ]+)\ *\)/
+      Regexp.compile /\A\s+([A-Z0-9\* ]+) FUNCTION ([A-Z0-9]+)\(\ *([A-Z0-9, ]+)\ *\)/
 
   # Matches e.g. INTEGER INCX,INCY,N
   VariableDecl =
-    Regexp.compile /\A\s+(#{Fortran.types_as_regexp})\ +([A-Z,()*0-9 ]+)/
+      Regexp.compile /\A\s+(#{Fortran.types_as_regexp})\ +([A-Z,()*0-9 ]+)/
 
   # Matches e.g. *  LDA     (input) INTEGER
   MetaComment =
-    Regexp.compile /\A\*>\s+\\param\[([a-zA-Z,\/]*)\]\s+([a-zA-Z]*)/
+      Regexp.compile /\A\*>\s+\\param\[([a-zA-Z,\/]*)\]\s+([a-zA-Z]*)/
 
   # Matches e.g. A, but also DX(*)
   ArgumentParens =
-    Regexp.compile /[A-Z0-9]+(?: *\([A-Z, 0-9*]+\))?/
+      Regexp.compile /[A-Z0-9]+(?: *\([A-Z, 0-9*]+\))?/
 
   # Matches e.g. "*  LDA     - "
   BLASArgumentCommentStart =
-    Regexp.compile /\A\*\s+([A-Z]+)\s+-\s/
+      Regexp.compile /\A\*\s+([A-Z]+)\s+-\s/
 
   UnchangedOnExit =
-    Regexp.compile /\A\*\s+Unchanged on exit./
+      Regexp.compile /\A\*\s+Unchanged on exit./
 
   # Concatenate all continuated lines. These are lines where there is a
   # mark ('$' or 'C') in the 5th column. For example:
@@ -132,6 +132,7 @@ module Fortran
   # are parsed and the information in parenthesis is extracted.
   def self.parse_file(f)
     routine = nil
+    var_comments = Hash.new
     lines = f.readlines
     lines = Fortran.parse_continuations(lines)
     blas_arg = nil
@@ -145,75 +146,79 @@ module Fortran
         #     DOUBLE PRECISION FUNCTION DDOT(N,DX,INCX,DY,INCY)
         #     SUBROUTINE DAXPY(N,DA,DX,INCX,DY,INCY)
         #
-      when SubroutineDecl
-        name = $1
-        args = $2.scan /[A-Z0-9]+/
-        puts "--- " + name if $debug
-        routine = Fortran.subroutine name, args
-      when FunctionDecl
-        return_type = $1
-        name = $2
-        args = $3.scan /[A-Z0-9]+/
-        routine = Fortran.function return_type, name, args
-        puts "   FunctionDecl matched --- " + name if $debug
+        when SubroutineDecl
+          name = $1
+          args = $2.scan /[A-Z0-9]+/
+          puts "--- " + name if $debug
+          routine = Fortran.subroutine name, args
+        when FunctionDecl
+          return_type = $1
+          name = $2
+          args = $3.scan /[A-Z0-9]+/
+          routine = Fortran.function return_type, name, args
+          puts "   FunctionDecl matched --- " + name if $debug
         #
         # parse argument types, e.g.
         #
         #      DOUBLE PRECISION DX(*),DY(*)
         #      COMPLEX*16       A( LDA, * ), VL( LDVL, * ), VR( L...
         #
-      when VariableDecl
-        puts "#$1 -> #$2" if $debug
-        type = $1
-        args = $2.scan ArgumentParens
-        type = type.sub(/\(\s+/, "(").sub(/\s+\)/, ")")
-        args.each do |argname|
-          puts "  #{argname} -> #{type}" if $debug
-          if argname =~ /([A-Z0-9]+)\ *\(.*\)/
-            argname = $1
-            array = true
-          else
-            array = false
+        when VariableDecl
+          puts "#$1 -> #$2" if $debug
+          type = $1
+          args = $2.scan ArgumentParens
+          type = type.sub(/\(\s+/, "(").sub(/\s+\)/, ")")
+          args.each do |argname|
+            puts "  #{argname} -> #{type}" if $debug
+            if argname =~ /([A-Z0-9]+)\ *\(.*\)/
+              argname = $1
+              array = true
+            else
+              array = false
+            end
+            if routine.args.member? argname
+              routine.argtype[argname] = Fortran::FortranType.new(type, array)
+            end
           end
-          if routine.args.member? argname
-            routine.argtype[argname] = Fortran::FortranType.new(type, array)
-          end
-        end
         #
         # parse comments which with respect to input/output, e.g.
         #
         # *  JOBVL   (input) CHARACTER*1
         #
-      when MetaComment
-        comment = $1; args = $2
-        puts "#{args} -> comment \"#{comment}\"" if $debug
-        args.split(',').each do |argname|
-          at = routine.argtype[argname]
-          if at
-            at.comment = comment
-          else
-            puts "Warning: cannot add comment to variable #{argname} in file #{f.path} line \"#{l}\" (argument not defined)"
+        when MetaComment
+          comment = $1; args = $2
+          puts "#{args} -> comment \"#{comment}\"" if $debug
+          args.split(',').each do |argname|
+            var_comments[argname] = comment
           end
-        end
         #
         # Parser beginning argument comments for BLAS
         #
-      when BLASArgumentCommentStart
-        blas_arg = $1
-        puts ">> #{l} << #{$1}" if $debug
-      when UnchangedOnExit
-        unless blas_arg.nil?
-          at = routine.argtype[blas_arg]
-          if at
-            puts "   adding (input)" if $debug
-            at.comment = 'input'
-          else
-            puts "Warning: cannot add input flag to variable #{blas_arg} in file #{f.path} line #{l} (argument not defined)"
+        when BLASArgumentCommentStart
+          blas_arg = $1
+          puts ">> #{l} << #{$1}" if $debug
+        when UnchangedOnExit
+          unless blas_arg.nil?
+            at = routine.argtype[blas_arg]
+            if at
+              puts "   adding (input)" if $debug
+              at.comment = 'input'
+            else
+              puts "Warning: cannot add input flag to variable #{blas_arg} in file #{f.path} line #{l} (argument not defined)"
+            end
+            blas_arg = nil
           end
-          blas_arg = nil
-        end
       end
     end
+    var_comments.each do |argname, comment|
+      at = routine.argtype[argname]
+      if at
+        at.comment = comment
+      else
+        puts "Warning: cannot add comment to variable #{argname} in file #{f.path}  (argument not defined)"
+      end
+    end
+
     return routine
   end
 end
