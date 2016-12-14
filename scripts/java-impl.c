@@ -131,8 +131,13 @@ static ComplexDouble getComplexDouble(JNIEnv *env, jobject dc)
 }
 <% end %>
 
-static void throwIllegalArgumentException(JNIEnv *env, const char *message)
+static JavaVM *savedVM = 0;
+
+
+static void throwIllegalArgumentException(const char *message)
 {
+  JNIEnv* env;
+  (*savedVM)->AttachCurrentThread(savedVM, (void **)&env, NULL);
   jclass klass = (*env)->FindClass(env, "java/lang/IllegalArgumentException");
 
   (*env)->ThrowNew(env, klass, message);
@@ -156,8 +161,6 @@ static char *routine_arguments[][<%= (routines.map do |r| r.args.length end).max
 /**********************************************************************/
 /*                 Our implementation of XERBLA                       */
 /**********************************************************************/
-static JNIEnv *savedEnv = 0;
-
 
 void xerbla_(char *fct, int *info)
 {
@@ -186,7 +189,25 @@ void xerbla_(char *fct, int *info)
 	else {
 		sprintf(buffer, "XERBLA: Error on argument %d (%s) in %s", *info, arguments[*info-1], name);
 	}
-	throwIllegalArgumentException(savedEnv, buffer);
+	throwIllegalArgumentException(buffer);
+}
+
+jint JNI_OnLoad(JavaVM *vm, void *reserved)
+{
+  savedVM = vm;
+
+  fprintf(stderr, "Called dynamic JNI_OnLoad.\n");
+
+  return JNI_VERSION_1_6;
+}
+
+jint JNI_OnLoad_L(JavaVM *vm, void *reserved)
+{
+  savedVM = vm;
+
+  fprintf(stderr, "Called static JNI_OnLoad_L.\n");
+
+  return JNI_VERSION_1_8;
 }
 
 /**********************************************************************/

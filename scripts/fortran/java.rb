@@ -228,7 +228,7 @@ JNIEXPORT #{return_type} JNICALL Java_#{fct_name}(JNIEnv *env, jclass this#{decl
   extern #{fortran_return_type} #{fortran_fct_name}(#{fortran_args.join(', ')});
   
 #{conversions}
-  savedEnv = env;
+  
   #{call_pre}#{fortran_fct_name}(#{call_args.join(', ')});
 #{release_arrays}#{call_post}
 }
